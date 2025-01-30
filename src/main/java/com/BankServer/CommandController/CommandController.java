@@ -1,18 +1,18 @@
-package com.BankServer;
+package com.BankServer.CommandController;
 
-import com.BankServer.BankCommands.Command;
+import com.BankServer.CommandController.BankCommands.BankCommand;
 
 import java.util.HashMap;
 
 public class CommandController {
 
-    private final HashMap<String, Command> commands;
+    private final HashMap<String, BankCommand> commands;
 
     public CommandController(){
         commands = new HashMap<>();
     }
 
-    public void registerCommand(String code, Command command){
+    public void registerCommand(String code, BankCommand command){
         commands.put(code, command);
     }
 

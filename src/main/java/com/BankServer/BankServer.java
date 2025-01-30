@@ -1,6 +1,9 @@
 package com.BankServer;
 
-import com.BankServer.BankCommands.BankCodeCommand;
+import com.BankServer.Bank.Bank;
+import com.BankServer.CommandController.BankCommands.BankCodeCommand;
+import com.BankServer.CommandController.BankCommands.CreateAccountCommand;
+import com.BankServer.CommandController.CommandController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,10 +17,12 @@ import java.util.Arrays;
 public class BankServer{
 
     private ServerSocket serverSocket;
+    private Bank bank;
 
     public void start(int port){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
+                bank = new Bank(InetAddress.getLocalHost().toString());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
@@ -61,7 +66,8 @@ public class BankServer{
         }
 
         private void registerCommands(){
-            commandController.registerCommand("BC", new BankCodeCommand(clientSocket));
+            commandController.registerCommand("BC", new BankCodeCommand(BankServer.this.bank));
+            commandController.registerCommand("CA", new CreateAccountCommand(BankServer.this.bank));
         }
 
         @Override
