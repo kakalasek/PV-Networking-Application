@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class BankTotalCommand implements BankCommand{
 
-    private Bank bank;
+    private final Bank bank;
 
     public BankTotalCommand(Bank bank){
         this.bank = bank;
@@ -12,6 +12,6 @@ public class BankTotalCommand implements BankCommand{
 
     @Override
     public String execute(String[] args) {
-        return "";
+        return bank.getBankTotal().toString();
     }
 }

@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class CreateAccountCommand implements BankCommand {
 
-    Bank bank;
+    private final Bank bank;
 
     public CreateAccountCommand(Bank bank){
         this.bank = bank;
@@ -12,6 +12,6 @@ public class CreateAccountCommand implements BankCommand {
 
     @Override
     public String execute(String[] args) {
-        return bank.createAccount();
+        return bank.createAccount() + "/" + bank.getBankCode();
     }
 }

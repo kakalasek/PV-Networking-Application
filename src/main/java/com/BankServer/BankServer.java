@@ -22,6 +22,7 @@ public class BankServer{
     public void start(int port){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
+            System.out.println("Bank server is running on ip address " + InetAddress.getLocalHost() + " and port " + port);
             bank = new Bank(InetAddress.getLocalHost().toString());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -67,7 +68,7 @@ public class BankServer{
 
         private void registerCommands(){
             commandController.registerCommand("BC", new BankCodeCommand(BankServer.this.bank));
-            commandController.registerCommand("CA", new CreateAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("AC", new CreateAccountCommand(BankServer.this.bank));
             commandController.registerCommand("AD", new DepositAccountCommand(BankServer.this.bank));
             commandController.registerCommand("AW", new WithdrawalAccountCommand(BankServer.this.bank));
             commandController.registerCommand("AB", new BalanceAccountCommand(BankServer.this.bank));

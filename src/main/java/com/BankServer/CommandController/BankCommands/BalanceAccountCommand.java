@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class BalanceAccountCommand implements BankCommand {
 
-    private Bank bank;
+    private final Bank bank;
 
     public BalanceAccountCommand(Bank bank){
         this.bank = bank;
@@ -12,6 +12,9 @@ public class BalanceAccountCommand implements BankCommand {
 
     @Override
     public String execute(String[] args) {
-        return "";
+        String account = args[0].split("/")[0];
+        String ip = args[0].split("/")[1];
+
+        return String.valueOf(bank.getAccountBalance(Integer.parseInt(account)));
     }
 }

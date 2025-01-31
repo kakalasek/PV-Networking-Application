@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class BankCodeCommand implements BankCommand {
 
-    Bank bank;
+    private final Bank bank;
 
     public BankCodeCommand(Bank bank){
         this.bank = bank;
@@ -12,7 +12,6 @@ public class BankCodeCommand implements BankCommand {
 
     @Override
     public String execute(String[] args) {
-        System.out.println(bank.getBankCode());
         return bank.getBankCode();
     }
 }

@@ -18,42 +18,73 @@ public class Bank {
     }
 
     // TODO create a mechanism for creating accounts which numbers were already assigned
-    public String createAccount(){
+    public int createAccount(){
         if (accounts.size() == 90_000){
-            return "Cant create any more accounts";
+            throw new RuntimeException("Cant create any more accounts");
         }
 
         Account newAccount = new Account(currentAccountNumber++, 0);
         accounts.add(newAccount);
-        return newAccount.getNumber() + "/" + bankCode;
+        return newAccount.getNumber();
     }
 
-    public String removeAccount(int number){
+    public void removeAccount(int number){
         for(int i = 0; i < accounts.size(); i++){
             if(accounts.get(i).getNumber() == number){
                 accounts.remove(i);
-                return String.valueOf(number);
+                return;
             }
         }
 
-        return "Account with this number does not exist";
+        throw new RuntimeException("Account with this number does not exist");
     }
 
     public String getBankCode(){
         return this.bankCode;
     }
 
-    public String getNumberOfClients(){
-        return String.valueOf(accounts.size());
+    public int getNumberOfClients(){
+        return accounts.size();
     }
 
-    public String getBankTotal(){
+    public BigInteger getBankTotal(){
         BigInteger bankTotal = BigInteger.ZERO;
         for(Account account : accounts){
             bankTotal = bankTotal.add(BigInteger.valueOf(account.getBalance()));
         }
 
-        return bankTotal.toString();
+        return bankTotal;
     }
 
+    public void depositMoney(int accountNumber, long deposit){
+        for(Account account : accounts){
+            if(account.getNumber() == accountNumber){
+                account.deposit(deposit);
+                return;
+            }
+        }
+
+        throw new RuntimeException("Account with this number does not exist");
+    }
+
+    public long getAccountBalance(int accountNumber){
+        for(Account account : accounts){
+            if(account.getNumber() == accountNumber){
+                return account.getBalance();
+            }
+        }
+
+        throw new RuntimeException("Account with this number does not exist");
+    }
+
+    public void withdrawMoney(int accountNumber, long withdrawal){
+        for(Account account : accounts){
+            if(account.getNumber() == accountNumber){
+                account.withdraw(withdrawal);
+                return;
+            }
+        }
+
+        throw new RuntimeException("Account with this number does not exist");
+    }
 }

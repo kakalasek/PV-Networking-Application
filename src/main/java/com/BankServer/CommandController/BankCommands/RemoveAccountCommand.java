@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class RemoveAccountCommand implements BankCommand{
 
-    private Bank bank;
+    private final Bank bank;
 
     public RemoveAccountCommand(Bank bank){
         this.bank = bank;
@@ -12,6 +12,11 @@ public class RemoveAccountCommand implements BankCommand{
 
     @Override
     public String execute(String[] args) {
+        String account = args[0].split("/")[0];
+        String ip = args[0].split("/")[1];
+
+        bank.removeAccount(Integer.parseInt(account));
+
         return "";
     }
 }

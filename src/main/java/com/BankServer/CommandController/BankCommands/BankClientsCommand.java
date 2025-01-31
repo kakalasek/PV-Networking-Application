@@ -4,7 +4,7 @@ import com.BankServer.Bank.Bank;
 
 public class BankClientsCommand implements BankCommand{
 
-    private Bank bank;
+    private final Bank bank;
 
     public BankClientsCommand(Bank bank){
         this.bank = bank;
@@ -12,6 +12,6 @@ public class BankClientsCommand implements BankCommand{
 
     @Override
     public String execute(String[] args) {
-        return "";
+        return String.valueOf(bank.getNumberOfClients());
     }
 }

@@ -25,6 +25,6 @@ public class CommandController {
 
         if(output == null) return "Such a command does not exist";
 
-        return output;
+        return code + " " + output;
     }
 }
