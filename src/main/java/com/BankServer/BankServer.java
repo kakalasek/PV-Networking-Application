@@ -4,25 +4,35 @@ import com.BankServer.Bank.Bank;
 import com.BankServer.CommandController.BankCommands.*;
 import com.BankServer.CommandController.CommandController;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.io.*;
+import java.net.*;
 import java.util.Arrays;
+import java.util.Properties;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class BankServer{
 
     private ServerSocket serverSocket;
+    private final int port;
     private Bank bank;
+    private static final Logger logger = LogManager.getLogger(BankServer.class);
 
-    public void start(int port){
+    public BankServer() throws IOException {
+        Properties prop = new Properties();
+
+        FileInputStream ip = new FileInputStream("config.properties");
+
+        prop.load(ip);
+
+        this.port = Integer.parseInt(prop.getProperty("PORT"));
+    }
+
+    public void start(){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
-            System.out.println("Bank server is running on ip address " + InetAddress.getLocalHost() + " and port " + port);
+            logger.info("Bank server is running on ip address {} and port {}", InetAddress.getLocalHost(), port);
             bank = new Bank(InetAddress.getLocalHost().toString());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {

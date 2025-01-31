@@ -4,7 +4,11 @@ import com.BankServer.BankServer;
 
 public class Main {
     public static void main(String[] args) {
-        BankServer bankServer = new BankServer();
-        bankServer.start(64800);
+        try {
+            BankServer bankServer = new BankServer();
+            bankServer.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
