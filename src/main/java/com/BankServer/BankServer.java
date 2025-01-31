@@ -12,6 +12,9 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Starts the main listening socket. For each client, it creates a separate connection thread
+ */
 public class BankServer{
 
     private ServerSocket serverSocket;
@@ -19,6 +22,10 @@ public class BankServer{
     private Bank bank;
     private static final Logger logger = LogManager.getLogger(BankServer.class);
 
+    /**
+     * Constructor for the BankServer. It uses the config file to load the port and timeout
+     * @throws IOException Gets thrown if an error occurred during loading the properties
+     */
     public BankServer() throws IOException {
         Properties prop = new Properties();
 
@@ -29,16 +36,21 @@ public class BankServer{
         this.port = Integer.parseInt(prop.getProperty("PORT"));
     }
 
+    /**
+     * Starts the BankServer. It now listens to user connections
+     */
     public void start(){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
-            logger.info("Bank server is running on ip address {} and port {}", InetAddress.getLocalHost().getHostAddress(), port);
-            bank = new Bank(InetAddress.getLocalHost().getHostAddress());
+            String ip_address = InetAddress.getLocalHost().getHostAddress();
+
+            logger.info("Bank server is running on ip address {} and port {}", ip_address, port);
+
+            bank = new Bank(ip_address);
             bank.readAccounts();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
-                    System.out.println(serverSocket.isClosed());
                     bank.saveAccounts();
                     if(serverSocket != null) serverSocket.close();
                 } catch (IOException e) {
@@ -48,11 +60,18 @@ public class BankServer{
 
             while(true) new Thread(new ClientHandler(serverSocket.accept())).start();
 
+        } catch (SocketException e){
+            logger.info("The application was shut down");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.fatal("There has been a problem with the server: {}", e.getMessage());
+        } catch (Exception e){
+            logger.fatal("An unexpected fatal error has occurred: {}", e.getMessage());
         }
     }
 
+    /**
+     * Represents a user connection. It is meant to run in a thread
+     */
     private class ClientHandler implements Runnable{
 
         private final Socket clientSocket;
@@ -66,6 +85,9 @@ public class BankServer{
 
         }
 
+        /**
+         * Simply registers all the commands with their code
+         */
         private void registerCommands(){
             commandController.registerCommand("BC", new BankCodeCommand(BankServer.this.bank));
             commandController.registerCommand("AC", new CreateAccountCommand(BankServer.this.bank));
@@ -96,28 +118,33 @@ public class BankServer{
 
                 String inputLine;
 
-                while((inputLine = in.readLine()) != null){
-                    if("END".equals(inputLine)) {
-                        out.println("Terminating connection");
-                        break;
-                    }
+                while ((inputLine = in.readLine()) != null) {
+                    try {
+                        if ("END".equals(inputLine)) {
+                            out.println("Terminating connection");
+                            break;
+                        }
 
-                    String[] inputLineSplit = inputLine.split(" ");
-                    String output = commandController.executeCommand(inputLineSplit[0], Arrays.copyOfRange(inputLineSplit, 1, inputLineSplit.length));
-                    out.println(output);
+                        String[] inputLineSplit = inputLine.split(" ");
+                        String output = commandController.executeCommand(inputLineSplit[0], Arrays.copyOfRange(inputLineSplit, 1, inputLineSplit.length));
+                        out.println(output);
+                    } catch (Exception e){
+                        out.println("ER " + e.getMessage());
+                    }
                 }
 
-                Thread.currentThread().interrupt();
-
+            } catch (SocketException e){
+                logger.info("The user thread {} was terminated", clientSocket.getRemoteSocketAddress());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("The user thread {} has ran into an error: {}", clientSocket.getRemoteSocketAddress(), e.getMessage());
             } finally {
                 try {
                     clientSocket.close();
                     out.close();
                     in.close();
+                    logger.info("The user thread {} was closed and terminated", clientSocket.getRemoteSocketAddress());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    logger.error("The user thread {} was not properly closed: {}", clientSocket.getRemoteSocketAddress(), e.getMessage());
                 }
             }
         }
