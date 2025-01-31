@@ -12,6 +12,7 @@ public class BankCodeCommand implements BankCommand {
 
     @Override
     public String execute(String[] args) {
+        System.out.println(bank.getBankCode());
         return bank.getBankCode();
     }
 }

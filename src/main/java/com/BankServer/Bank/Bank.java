@@ -2,6 +2,7 @@ package com.BankServer.Bank;
 
 import com.BankServer.Bank.Account.Account;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,32 @@ public class Bank {
         return newAccount.getNumber() + "/" + bankCode;
     }
 
+    public String removeAccount(int number){
+        for(int i = 0; i < accounts.size(); i++){
+            if(accounts.get(i).getNumber() == number){
+                accounts.remove(i);
+                return String.valueOf(number);
+            }
+        }
+
+        return "Account with this number does not exist";
+    }
+
     public String getBankCode(){
         return this.bankCode;
     }
+
+    public String getNumberOfClients(){
+        return String.valueOf(accounts.size());
+    }
+
+    public String getBankTotal(){
+        BigInteger bankTotal = BigInteger.ZERO;
+        for(Account account : accounts){
+            bankTotal = bankTotal.add(BigInteger.valueOf(account.getBalance()));
+        }
+
+        return bankTotal.toString();
+    }
+
 }

@@ -23,7 +23,7 @@ public class CommandController {
             if(currentCode.equals(code)) output = commands.get(currentCode).execute(args);
         }
 
-        if(output == null) throw new RuntimeException("This command was not found");
+        if(output == null) return "Such a command does not exist";
 
         return output;
     }

@@ -1,8 +1,7 @@
 package com.BankServer;
 
 import com.BankServer.Bank.Bank;
-import com.BankServer.CommandController.BankCommands.BankCodeCommand;
-import com.BankServer.CommandController.BankCommands.CreateAccountCommand;
+import com.BankServer.CommandController.BankCommands.*;
 import com.BankServer.CommandController.CommandController;
 
 import java.io.BufferedReader;
@@ -12,6 +11,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 
 public class BankServer{
@@ -22,7 +22,7 @@ public class BankServer{
     public void start(int port){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
-                bank = new Bank(InetAddress.getLocalHost().toString());
+            bank = new Bank(InetAddress.getLocalHost().toString());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
@@ -52,7 +52,7 @@ public class BankServer{
         private BufferedReader in;
         private final CommandController commandController;
 
-        public ClientHandler(Socket socket){
+        public ClientHandler(Socket socket) throws SocketException {
             this.clientSocket = socket;
             commandController = new CommandController();
 
@@ -68,6 +68,12 @@ public class BankServer{
         private void registerCommands(){
             commandController.registerCommand("BC", new BankCodeCommand(BankServer.this.bank));
             commandController.registerCommand("CA", new CreateAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("AD", new DepositAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("AW", new WithdrawalAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("AB", new BalanceAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("AR", new RemoveAccountCommand(BankServer.this.bank));
+            commandController.registerCommand("BA", new BankTotalCommand(BankServer.this.bank));
+            commandController.registerCommand("BN", new BankClientsCommand(BankServer.this.bank));
         }
 
         @Override
@@ -80,8 +86,8 @@ public class BankServer{
                 String inputLine;
 
                 while((inputLine = in.readLine()) != null){
-                    if(".".equals(inputLine)) {
-                        out.println("bye");
+                    if("END".equals(inputLine)) {
+                        out.println("Terminating connection");
                         break;
                     }
 

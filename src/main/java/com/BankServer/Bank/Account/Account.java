@@ -2,9 +2,9 @@ package com.BankServer.Bank.Account;
 
 public class Account {
     private int number;
-    private int balance;
+    private long balance;
 
-    public Account(int number, int balance){
+    public Account(int number, long balance){
         this.number = number;
         this.balance = balance;
     }
@@ -13,7 +13,15 @@ public class Account {
         return this.number;
     }
 
-    public int getBalance(){
+    public long getBalance(){
         return this.balance;
+    }
+
+    public void deposit(long amount){
+        balance += amount;
+    }
+
+    public void withdraw(long amount){
+        balance -= amount;
     }
 }
