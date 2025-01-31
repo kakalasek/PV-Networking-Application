@@ -1,7 +1,9 @@
 package com.BankServer.Bank;
 
 import com.BankServer.Bank.Account.Account;
+import com.Utils.FileHandler.FileHandler;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,5 +88,23 @@ public class Bank {
         }
 
         throw new RuntimeException("Account with this number does not exist");
+    }
+
+    public void saveAccounts() throws IOException {
+        for(Account account : accounts){
+            String number = String.valueOf(account.getNumber());
+            String balance = String.valueOf(account.getBalance());
+
+            FileHandler.appendCsvRow("accounts.csv", new String[]{number, balance});
+        }
+    }
+
+    public void readAccounts() throws IOException{
+        for(String[] account : FileHandler.readCsv("accounts.csv")){
+            int number = Integer.parseInt(account[0]);
+            int balance = Integer.parseInt(account[1]);
+
+            accounts.add(new Account(number, balance));
+        }
     }
 }

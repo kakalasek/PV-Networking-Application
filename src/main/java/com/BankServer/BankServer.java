@@ -32,8 +32,8 @@ public class BankServer{
     public void start(){
         try {
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
-            logger.info("Bank server is running on ip address {} and port {}", InetAddress.getLocalHost(), port);
-            bank = new Bank(InetAddress.getLocalHost().toString());
+            logger.info("Bank server is running on ip address {} and port {}", InetAddress.getLocalHost().getHostAddress(), port);
+            bank = new Bank(InetAddress.getLocalHost().getHostAddress());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
@@ -49,6 +49,7 @@ public class BankServer{
             throw new RuntimeException(e);
         } finally {
             try {
+
                 if(serverSocket != null) serverSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
