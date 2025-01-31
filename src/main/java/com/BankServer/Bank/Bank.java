@@ -91,6 +91,8 @@ public class Bank {
     }
 
     public void saveAccounts() throws IOException {
+        FileHandler.clearFile("accounts.csv");
+
         for(Account account : accounts){
             String number = String.valueOf(account.getNumber());
             String balance = String.valueOf(account.getBalance());

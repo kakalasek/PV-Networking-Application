@@ -34,9 +34,12 @@ public class BankServer{
             serverSocket = new ServerSocket(port, 1, InetAddress.getLocalHost());
             logger.info("Bank server is running on ip address {} and port {}", InetAddress.getLocalHost().getHostAddress(), port);
             bank = new Bank(InetAddress.getLocalHost().getHostAddress());
+            bank.readAccounts();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 try {
+                    System.out.println(serverSocket.isClosed());
+                    bank.saveAccounts();
                     if(serverSocket != null) serverSocket.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -47,13 +50,6 @@ public class BankServer{
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-
-                if(serverSocket != null) serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -68,13 +64,6 @@ public class BankServer{
             this.clientSocket = socket;
             commandController = new CommandController();
 
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    if(clientSocket != null) clientSocket.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }));
         }
 
         private void registerCommands(){
@@ -95,6 +84,16 @@ public class BankServer{
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        clientSocket.close();
+                        out.close();
+                        in.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
+
                 String inputLine;
 
                 while((inputLine = in.readLine()) != null){
@@ -108,15 +107,17 @@ public class BankServer{
                     out.println(output);
                 }
 
+                Thread.currentThread().interrupt();
+
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 try {
-                    in.close();
-                    out.close();
                     clientSocket.close();
+                    out.close();
+                    in.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }

@@ -13,7 +13,8 @@ public class FileHandler {
                 for(String attribute : row){
                     rowString.append(attribute).append(",");
                 }
-                bufferedWriter.write(rowString.toString());
+                rowString.replace(rowString.length()-1,rowString.length(), "");
+                bufferedWriter.write(rowString + "\n");
             }
         }
     }
@@ -24,7 +25,8 @@ public class FileHandler {
                 for(String attribute : row){
                     rowString.append(attribute).append(",");
                 }
-                bufferedWriter.write(rowString.toString());
+                rowString.replace(rowString.length()-1,rowString.length(), "");
+                bufferedWriter.write(rowString + "\n");
         }
     }
 
@@ -38,5 +40,11 @@ public class FileHandler {
         }
 
         return rows;
+    }
+
+    public static void clearFile(String filepath) throws IOException{
+        try(FileWriter fileWriter = new FileWriter(filepath)){
+            fileWriter.write("");
+        }
     }
 }
