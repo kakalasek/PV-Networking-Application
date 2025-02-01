@@ -75,14 +75,15 @@ public class BankServer{
     private class ClientHandler implements Runnable{
 
         private final Socket clientSocket;
+        private final String clientIpAddress;
         private PrintWriter out;
         private BufferedReader in;
         private final CommandController commandController;
 
         public ClientHandler(Socket socket) throws SocketException {
             this.clientSocket = socket;
+            this.clientIpAddress = clientSocket.getRemoteSocketAddress().toString();
             commandController = new CommandController();
-
         }
 
         /**
@@ -120,6 +121,8 @@ public class BankServer{
 
                 while ((inputLine = in.readLine()) != null) {
                     try {
+                        logger.info("The user thread {} executed this command: {}", clientIpAddress, inputLine);
+
                         if ("END".equals(inputLine)) {
                             out.println("Terminating connection");
                             break;
@@ -128,23 +131,27 @@ public class BankServer{
                         String[] inputLineSplit = inputLine.split(" ");
                         String output = commandController.executeCommand(inputLineSplit[0], Arrays.copyOfRange(inputLineSplit, 1, inputLineSplit.length));
                         out.println(output);
+
+                        logger.info("The reply to user thread {} was: {}", clientIpAddress, output);
                     } catch (Exception e){
-                        out.println("ER " + e.getMessage());
+                        String errorMessage = "ER" + e.getMessage();
+                        out.println(errorMessage);
+                        logger.warn("The reply to user thread {} was: {}", clientIpAddress, errorMessage);
                     }
                 }
 
             } catch (SocketException e){
-                logger.info("The user thread {} was terminated", clientSocket.getRemoteSocketAddress());
+                logger.info("The user thread {} was terminated", clientIpAddress);
             } catch (IOException e) {
-                logger.error("The user thread {} has ran into an error: {}", clientSocket.getRemoteSocketAddress(), e.getMessage());
+                logger.error("The user thread {} has ran into an error: {}", clientIpAddress, e.getMessage());
             } finally {
                 try {
                     clientSocket.close();
                     out.close();
                     in.close();
-                    logger.info("The user thread {} was closed and terminated", clientSocket.getRemoteSocketAddress());
+                    logger.info("The user thread {} was closed and terminated", clientIpAddress);
                 } catch (IOException e) {
-                    logger.error("The user thread {} was not properly closed: {}", clientSocket.getRemoteSocketAddress(), e.getMessage());
+                    logger.error("The user thread {} was not properly closed: {}", clientIpAddress, e.getMessage());
                 }
             }
         }
