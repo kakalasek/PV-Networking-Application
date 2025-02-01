@@ -1,6 +1,7 @@
 package com.BankServer.Bank;
 
 import com.BankServer.Bank.Account.Account;
+import com.CustomExceptions.AccountsFullException;
 import com.Utils.FileHandler.FileHandler;
 
 import java.io.IOException;
@@ -8,24 +9,55 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a bank.
+ */
 public class Bank {
 
     private final String bankCode;
     private final List<Account> accounts;
-    private int currentAccountNumber = 10000;
+    private int currentAccountNumber;
+    private final int maxAccountNumber;
+    private final List<Integer> availableAccountNumbersOutOfOrder;
+    private final String accountsFilePath;
+    private final String outOfOrderFilePath;
 
-    public Bank(String bankCode){
+    /**
+     * Creates the bank object
+     * @param bankCode Represents the code of the bank
+     * @throws IOException Is thrown if creating the compulsory files fails
+     */
+    public Bank(String bankCode) throws IOException {
         this.bankCode = bankCode;
-        accounts = new ArrayList<>();
+        this.accounts = new ArrayList<>();
+        this.availableAccountNumbersOutOfOrder = new ArrayList<>();
+        this.currentAccountNumber = 10_000;
+        this.maxAccountNumber = 90_000;
+        this.accountsFilePath = "accounts.csv";
+        this.outOfOrderFilePath = "outoforder.csv";
+        FileHandler.createFiles(new String[]{accountsFilePath, outOfOrderFilePath});
     }
 
-    // TODO create a mechanism for creating accounts which numbers were already assigned
+    /**
+     * Creates a new account. If there are any account numbers out of sequence, it will use those numbers
+     * preferably, otherwise it will continue sequentially from currentAccountNumber (current value of
+     * currentAccountNumber will be assigned to the next Account and incremented)
+     * @return The number of the created account
+     * @throws AccountsFullException Gets thrown if this bank already has all possible accounts created
+     */
     public int createAccount(){
-        if (accounts.size() == 90_000){
-            throw new RuntimeException("Cant create any more accounts");
+        if (accounts.size() >= maxAccountNumber){
+            throw new AccountsFullException("Cant create any more accounts in this bank");
         }
 
-        Account newAccount = new Account(currentAccountNumber++, 0);
+        Account newAccount;
+
+            if(!availableAccountNumbersOutOfOrder.isEmpty()){
+                newAccount = new Account(availableAccountNumbersOutOfOrder.removeFirst(), 0);
+            } else{
+                newAccount = new Account(currentAccountNumber++, 0);
+            }
+
         accounts.add(newAccount);
         return newAccount.getNumber();
     }
@@ -33,7 +65,7 @@ public class Bank {
     public void removeAccount(int number){
         for(int i = 0; i < accounts.size(); i++){
             if(accounts.get(i).getNumber() == number){
-                accounts.remove(i);
+                availableAccountNumbersOutOfOrder.add(accounts.remove(i).getNumber());
                 return;
             }
         }
@@ -90,23 +122,45 @@ public class Bank {
         throw new RuntimeException("Account with this number does not exist");
     }
 
+    /**
+     * Saves accounts into a csv file. It also saves the out-of-order account numbers.
+     * @throws IOException Gets thrown if there is any problem with writing the accounts into the csv file
+     */
     public void saveAccounts() throws IOException {
-        FileHandler.clearFile("accounts.csv");
+        FileHandler.clearFile(accountsFilePath);
+        FileHandler.clearFile(outOfOrderFilePath);
 
         for(Account account : accounts){
             String number = String.valueOf(account.getNumber());
             String balance = String.valueOf(account.getBalance());
 
-            FileHandler.appendCsvRow("accounts.csv", new String[]{number, balance});
+            FileHandler.appendCsvRow(accountsFilePath, new String[]{number, balance});
+        }
+
+        for(Integer accountNumber : availableAccountNumbersOutOfOrder){
+            FileHandler.appendCsvRow(outOfOrderFilePath, new String[]{String.valueOf(accountNumber)});
         }
     }
 
+    /**
+     * It reads all the account numbers from a csv file. It also reads all the out-of-order account numbers
+     * @throws IOException Gets thrown if something goes wrong while reading the csv files
+     */
     public void readAccounts() throws IOException{
-        for(String[] account : FileHandler.readCsv("accounts.csv")){
+        int highestAccountNumber = 10000;
+
+        for(String[] account : FileHandler.readCsv(accountsFilePath)){
             int number = Integer.parseInt(account[0]);
             int balance = Integer.parseInt(account[1]);
 
+            if(number > highestAccountNumber) highestAccountNumber = number;
+
             accounts.add(new Account(number, balance));
+        }
+        this.currentAccountNumber = highestAccountNumber;
+
+        for(String[] accountNumber : FileHandler.readCsv(outOfOrderFilePath)){
+            availableAccountNumbersOutOfOrder.add(Integer.valueOf(accountNumber[0]));
         }
     }
 }

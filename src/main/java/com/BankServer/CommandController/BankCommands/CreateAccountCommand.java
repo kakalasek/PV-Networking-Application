@@ -12,6 +12,7 @@ public class CreateAccountCommand implements BankCommand {
 
     @Override
     public String execute(String[] args) {
+
         return bank.createAccount() + "/" + bank.getBankCode();
     }
 }

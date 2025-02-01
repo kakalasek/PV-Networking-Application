@@ -9,6 +9,7 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.Properties;
 
+import com.Utils.FileHandler.FileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -134,7 +135,7 @@ public class BankServer{
 
                         logger.info("The reply to user thread {} was: {}", clientIpAddress, output);
                     } catch (Exception e){
-                        String errorMessage = "ER" + e.getMessage();
+                        String errorMessage = "ER " + e.getMessage();
                         out.println(errorMessage);
                         logger.warn("The reply to user thread {} was: {}", clientIpAddress, errorMessage);
                     }

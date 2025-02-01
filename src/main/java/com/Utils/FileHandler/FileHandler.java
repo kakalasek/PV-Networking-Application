@@ -73,4 +73,11 @@ public class FileHandler {
             fileWriter.write("");
         }
     }
+
+    public static void createFiles(String[] filepaths) throws IOException{
+        for(String filepath : filepaths){
+            File newFile = new File(filepath);
+            newFile.createNewFile();
+        }
+    }
 }
