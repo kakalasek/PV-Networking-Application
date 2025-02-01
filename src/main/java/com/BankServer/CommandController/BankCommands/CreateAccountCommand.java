@@ -3,7 +3,7 @@ package com.BankServer.CommandController.BankCommands;
 import com.BankServer.Bank.Bank;
 
 /**
- * Is used to create a new account
+ * Used to create a new account
  */
 public class CreateAccountCommand implements BankCommand {
 

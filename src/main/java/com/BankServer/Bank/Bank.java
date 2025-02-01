@@ -2,6 +2,7 @@ package com.BankServer.Bank;
 
 import com.BankServer.Bank.Account.Account;
 import com.CustomExceptions.AccountDebtException;
+import com.CustomExceptions.AccountNotEmptyException;
 import com.CustomExceptions.AccountsFullException;
 import com.CustomExceptions.NonExistingAccountException;
 import com.Utils.FileHandler.FileHandler;
@@ -67,15 +68,24 @@ public class Bank {
         return newAccount.getNumber();
     }
 
-    public void removeAccount(int number){
+    /**
+     * Removes an account. It also adds its number into availableAccountNumbersOutOfOrder, so it can be reused
+     * with the next account creation
+     * @param accountNumber Number of the account you want to deposit money to
+     * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
+     * @throws AccountNotEmptyException If the accounts balance is not zero
+     */
+    public void removeAccount(int accountNumber){
         for(int i = 0; i < accounts.size(); i++){
-            if(accounts.get(i).getNumber() == number){
+            if(accounts.get(i).getNumber() == accountNumber){
+                if(accounts.get(i).getBalance() > 0) throw new AccountNotEmptyException("You can only delete an account with balance equal to zero");
+
                 availableAccountNumbersOutOfOrder.add(accounts.remove(i).getNumber());
                 return;
             }
         }
 
-        throw new RuntimeException("Account with this number does not exist");
+        throw new NonExistingAccountException("Account with this number does not exist");
     }
 
     public String getBankCode(){
