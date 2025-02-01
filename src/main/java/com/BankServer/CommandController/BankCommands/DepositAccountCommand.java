@@ -4,10 +4,11 @@ import com.BankServer.Bank.Bank;
 import com.Utils.InputHandler.InputHandler;
 import com.google.common.net.InetAddresses;
 
-import java.math.BigDecimal;
-import java.net.InetAddress;
 import java.security.InvalidParameterException;
 
+/**
+ * Used to deposit money to a bank account.
+ */
 public class DepositAccountCommand implements BankCommand{
 
     private final Bank bank;
@@ -16,6 +17,13 @@ public class DepositAccountCommand implements BankCommand{
         this.bank = bank;
     }
 
+    /**
+     * Deposits money to a bank account
+     * @param args args[0] ... accountNumber/bankCode(ipv4 address)
+     *             args[1] ... amount of money to deposit (in long datatype)
+     * @return If the deposit is successful, returns an empty string
+     * @throws InvalidParameterException If there is any problem with the provided arguments
+     */
     @Override
     public String execute(String[] args) {
 
