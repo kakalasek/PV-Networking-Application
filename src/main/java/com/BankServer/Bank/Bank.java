@@ -17,6 +17,7 @@ public class Bank {
     private final String bankCode;
     private final List<Account> accounts;
     private int currentAccountNumber;
+    private final int minAccountNumber;
     private final int maxAccountNumber;
     private final List<Integer> availableAccountNumbersOutOfOrder;
     private final String accountsFilePath;
@@ -31,8 +32,9 @@ public class Bank {
         this.bankCode = bankCode;
         this.accounts = new ArrayList<>();
         this.availableAccountNumbersOutOfOrder = new ArrayList<>();
-        this.currentAccountNumber = 10_000;
-        this.maxAccountNumber = 90_000;
+        this.minAccountNumber = 10_000;
+        this.maxAccountNumber = 99_999;
+        this.currentAccountNumber = this.minAccountNumber;
         this.accountsFilePath = "accounts.csv";
         this.outOfOrderFilePath = "outoforder.csv";
         FileHandler.createFiles(new String[]{accountsFilePath, outOfOrderFilePath});
@@ -120,6 +122,15 @@ public class Bank {
         }
 
         throw new RuntimeException("Account with this number does not exist");
+    }
+
+    /**
+     * Checks if the provided account number can be an account number in this bank
+     * @param accountNumber The account number you want to test
+     * @return True if the account number can be an account number in this bank, false if not
+     */
+    public boolean isAccountNumber(int accountNumber){
+        return accountNumber >= minAccountNumber && accountNumber <= maxAccountNumber;
     }
 
     /**

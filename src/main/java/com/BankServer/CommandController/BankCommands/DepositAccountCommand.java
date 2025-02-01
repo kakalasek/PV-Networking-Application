@@ -1,6 +1,12 @@
 package com.BankServer.CommandController.BankCommands;
 
 import com.BankServer.Bank.Bank;
+import com.Utils.InputHandler.InputHandler;
+import com.google.common.net.InetAddresses;
+
+import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.security.InvalidParameterException;
 
 public class DepositAccountCommand implements BankCommand{
 
@@ -12,11 +18,24 @@ public class DepositAccountCommand implements BankCommand{
 
     @Override
     public String execute(String[] args) {
-        String account = args[0].split("/")[0];
-        String ip = args[0].split("/")[1];
+
+        String[] accountAndIp = args[0].split("/");
+
+        if(accountAndIp.length != 2){
+            throw new InvalidParameterException("You have to provide your account number and ip separated by /");
+        }
+
+        String account = accountAndIp[0];
+        String ip = accountAndIp[1];
         String deposit = args[1];
 
-        bank.depositMoney(Integer.parseInt(account), Integer.parseInt(deposit));
+        if(!account.matches("\\d+")) throw new InvalidParameterException("The account number must be a natural number");
+        if(!bank.isAccountNumber(Integer.parseInt(account))) throw new InvalidParameterException("This account number cant exist in this bank");
+        if(!InetAddresses.isInetAddress(ip)) throw new InvalidParameterException("The bank code must be a valid ip address");
+        if(!deposit.matches("\\d+")) throw new InvalidParameterException("The deposit must be a natural number");
+        if(!InputHandler.isValidLong(deposit)) throw new InvalidParameterException("The amount of money you want to deposit is too large");
+
+        bank.depositMoney(Integer.parseInt(account), Long.parseLong(deposit));
 
         return "";
     }

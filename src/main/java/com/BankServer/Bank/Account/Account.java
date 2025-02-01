@@ -1,5 +1,7 @@
 package com.BankServer.Bank.Account;
 
+import com.CustomExceptions.AccountOverflowException;
+
 /**
  * Represents a user account
  */
@@ -24,13 +26,18 @@ public class Account {
      * Deposits money into the account
      * @param amount The amount of money to deposit
      * @throws IllegalArgumentException If the amount of money to deposit is negative
+     * @throws AccountOverflowException If the amount of money to deposit would overflow the balance variable
      */
     public void deposit(long amount){
         if(amount < 0){
             throw new IllegalArgumentException("The amount must be a positive number");
         }
 
-        balance += amount;
+        try {
+            balance += amount;
+        } catch (Exception e){
+            throw new AccountOverflowException("No money was deposited. There is already too much money on this account");
+        }
     }
 
     /**
