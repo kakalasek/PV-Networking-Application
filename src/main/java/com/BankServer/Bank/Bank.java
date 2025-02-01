@@ -1,11 +1,14 @@
 package com.BankServer.Bank;
 
 import com.BankServer.Bank.Account.Account;
+import com.CustomExceptions.AccountDebtException;
 import com.CustomExceptions.AccountsFullException;
+import com.CustomExceptions.NonExistingAccountException;
 import com.Utils.FileHandler.FileHandler;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +86,10 @@ public class Bank {
         return accounts.size();
     }
 
+    /**
+     * Calculates the bank total balance and returns it
+     * @return The bank total balance in BigInteger format
+     */
     public BigInteger getBankTotal(){
         BigInteger bankTotal = BigInteger.ZERO;
         for(Account account : accounts){
@@ -92,6 +99,12 @@ public class Bank {
         return bankTotal;
     }
 
+    /**
+     * Deposits money into an account
+     * @param accountNumber Number of the account you want to deposit money to
+     * @param deposit The amount of money you want to deposit
+     * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
+     */
     public void depositMoney(int accountNumber, long deposit){
         for(Account account : accounts){
             if(account.getNumber() == accountNumber){
@@ -100,9 +113,15 @@ public class Bank {
             }
         }
 
-        throw new RuntimeException("Account with this number does not exist");
+        throw new NonExistingAccountException("Account with this number does not exist");
     }
 
+    /**
+     * Returns the balance of the specified account
+     * @param accountNumber Number of the account you want check the balance of
+     * @return The balance of the account
+     * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
+     */
     public long getAccountBalance(int accountNumber){
         for(Account account : accounts){
             if(account.getNumber() == accountNumber){
@@ -110,18 +129,27 @@ public class Bank {
             }
         }
 
-        throw new RuntimeException("Account with this number does not exist");
+        throw new NonExistingAccountException("Account with this number does not exist");
     }
 
+    /**
+     * Withdraws money from the account
+     * @param accountNumber Number of the account you want to withdraw money from
+     * @param withdrawal The amount of money you want to withdraw
+     * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
+     * @throws AccountDebtException If the withdrawal was to result in negative balance on the account
+     */
     public void withdrawMoney(int accountNumber, long withdrawal){
         for(Account account : accounts){
             if(account.getNumber() == accountNumber){
+                if(account.getBalance() - withdrawal < 0) throw new AccountDebtException("You cannot withdraw more money, than you have on your account");
+
                 account.withdraw(withdrawal);
                 return;
             }
         }
 
-        throw new RuntimeException("Account with this number does not exist");
+        throw new NonExistingAccountException("Account with this number does not exist");
     }
 
     /**

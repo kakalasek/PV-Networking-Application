@@ -50,6 +50,10 @@ public class Account {
             throw new IllegalArgumentException("The amount must be a positive number");
         }
 
-        balance -= amount;
+        try {
+            balance -= amount;
+        } catch (Exception e){
+            throw new AccountOverflowException("No money was withdrew. The is too big of a dept on this account");
+        }
     }
 }
