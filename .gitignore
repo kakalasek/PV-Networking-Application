@@ -43,3 +43,4 @@ build/
 ### Temp ###
 accounts.csv
 outoforder.csv
+.out/artifacts/PV_Networking_Application_jar/config.properties
