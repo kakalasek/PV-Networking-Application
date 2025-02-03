@@ -25,6 +25,7 @@ public class Bank {
     private final List<Integer> availableAccountNumbersOutOfOrder;
     private final String accountsFilePath;
     private final String outOfOrderFilePath;
+    private BigInteger bankTotal;
 
     /**
      * Creates the bank object
@@ -40,6 +41,7 @@ public class Bank {
         this.currentAccountNumber = this.minAccountNumber;
         this.accountsFilePath = "accounts.csv";
         this.outOfOrderFilePath = "outoforder.csv";
+        this.bankTotal = BigInteger.ZERO;
         FileHandler.createFiles(new String[]{accountsFilePath, outOfOrderFilePath});
     }
 
@@ -94,16 +96,7 @@ public class Bank {
         return accountsMap.size();
     }
 
-    /**
-     * Calculates the bank total balance and returns it
-     * @return The bank total balance in BigInteger format
-     */
     public BigInteger getBankTotal(){
-        BigInteger bankTotal = BigInteger.ZERO;
-        for(Account account : accountsMap.values()){
-            bankTotal = bankTotal.add(BigInteger.valueOf(account.getBalance()));
-        }
-
         return bankTotal;
     }
 
@@ -121,6 +114,7 @@ public class Bank {
         if(account == null) throw new NonExistingAccountException("Account with this number does not exist");
 
         account.deposit(deposit);
+        bankTotal = bankTotal.add(BigInteger.valueOf(deposit));
     }
 
     /**
@@ -154,6 +148,7 @@ public class Bank {
         if((account.getBalance() - withdrawal) < 0) throw new AccountDebtException("You cannot withdraw more money than you have on your account");
 
         account.withdraw(withdrawal);
+        bankTotal = bankTotal.subtract(BigInteger.valueOf(withdrawal));
     }
 
     /**

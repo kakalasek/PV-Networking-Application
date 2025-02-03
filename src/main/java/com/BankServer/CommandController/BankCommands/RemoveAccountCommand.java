@@ -23,11 +23,11 @@ public class RemoveAccountCommand implements BankCommand{
      */
     @Override
     public String execute(String[] args) {
+        if(args.length == 0) throw new InvalidParameterException("You have to provide your account number and ip separated by /");
+
         String[] accountAndIp = args[0].split("/");
 
-        if(accountAndIp.length != 2){
-            throw new InvalidParameterException("You have to provide your account number and ip separated by /");
-        }
+        if(accountAndIp.length != 2) throw new InvalidParameterException("You have to provide your account number and ip separated by /");
 
         String account = accountAndIp[0];
         String ip = accountAndIp[1];
