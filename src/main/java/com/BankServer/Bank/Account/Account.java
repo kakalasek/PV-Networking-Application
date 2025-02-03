@@ -44,6 +44,7 @@ public class Account {
      * Withdraws money from the account
      * @param amount The amount of money to withdraw
      * @throws IllegalArgumentException If the amount of money to withdraw is negative
+     * @throws AccountOverflowException If the amount of money to withdraw would overflow the balance variable
      */
     public void withdraw(long amount){
         if(amount < 0){

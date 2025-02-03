@@ -6,20 +6,19 @@ import com.CustomExceptions.AccountNotEmptyException;
 import com.CustomExceptions.AccountsFullException;
 import com.CustomExceptions.NonExistingAccountException;
 import com.Utils.FileHandler.FileHandler;
+import com.CustomExceptions.AccountOverflowException;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidParameterException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-/**
- * Represents a bank.
- */
 public class Bank {
 
     private final String bankCode;
-    private final List<Account> accounts;
+    private final AbstractMap<Integer, Account> accountsMap;
     private int currentAccountNumber;
     private final int minAccountNumber;
     private final int maxAccountNumber;
@@ -34,7 +33,7 @@ public class Bank {
      */
     public Bank(String bankCode) throws IOException {
         this.bankCode = bankCode;
-        this.accounts = new ArrayList<>();
+        this.accountsMap = new HashMap<>();
         this.availableAccountNumbersOutOfOrder = new ArrayList<>();
         this.minAccountNumber = 10_000;
         this.maxAccountNumber = 99_999;
@@ -52,7 +51,7 @@ public class Bank {
      * @throws AccountsFullException Gets thrown if this bank already has all possible accounts created
      */
     public int createAccount(){
-        if (accounts.size() >= maxAccountNumber){
+        if (accountsMap.size() >= maxAccountNumber){
             throw new AccountsFullException("Cant create any more accounts in this bank");
         }
 
@@ -64,7 +63,7 @@ public class Bank {
                 newAccount = new Account(currentAccountNumber++, 0);
             }
 
-        accounts.add(newAccount);
+        accountsMap.put(newAccount.getNumber(), newAccount);
         return newAccount.getNumber();
     }
 
@@ -76,16 +75,15 @@ public class Bank {
      * @throws AccountNotEmptyException If the accounts balance is not zero
      */
     public void removeAccount(int accountNumber){
-        for(int i = 0; i < accounts.size(); i++){
-            if(accounts.get(i).getNumber() == accountNumber){
-                if(accounts.get(i).getBalance() > 0) throw new AccountNotEmptyException("You can only delete an account with balance equal to zero");
+        Account account = accountsMap.get(accountNumber);
 
-                availableAccountNumbersOutOfOrder.add(accounts.remove(i).getNumber());
-                return;
-            }
-        }
+        if(account == null) throw new NonExistingAccountException("Account with this number does not exist");
 
-        throw new NonExistingAccountException("Account with this number does not exist");
+        if(account.getBalance() > 0) throw new AccountNotEmptyException("You can only delete an account with balance equal to zero");
+
+        accountsMap.remove(accountNumber);
+
+        availableAccountNumbersOutOfOrder.add(accountNumber);
     }
 
     public String getBankCode(){
@@ -93,7 +91,7 @@ public class Bank {
     }
 
     public int getNumberOfClients(){
-        return accounts.size();
+        return accountsMap.size();
     }
 
     /**
@@ -102,7 +100,7 @@ public class Bank {
      */
     public BigInteger getBankTotal(){
         BigInteger bankTotal = BigInteger.ZERO;
-        for(Account account : accounts){
+        for(Account account : accountsMap.values()){
             bankTotal = bankTotal.add(BigInteger.valueOf(account.getBalance()));
         }
 
@@ -114,16 +112,15 @@ public class Bank {
      * @param accountNumber Number of the account you want to deposit money to
      * @param deposit The amount of money you want to deposit
      * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
+     * @throws IllegalArgumentException If the amount of money to deposit is negative
+     * @throws AccountOverflowException If the amount of money to deposit would overflow the accounts balance
      */
     public void depositMoney(int accountNumber, long deposit){
-        for(Account account : accounts){
-            if(account.getNumber() == accountNumber){
-                account.deposit(deposit);
-                return;
-            }
-        }
+        Account account = accountsMap.get(accountNumber);
 
-        throw new NonExistingAccountException("Account with this number does not exist");
+        if(account == null) throw new NonExistingAccountException("Account with this number does not exist");
+
+        account.deposit(deposit);
     }
 
     /**
@@ -133,13 +130,11 @@ public class Bank {
      * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
      */
     public long getAccountBalance(int accountNumber){
-        for(Account account : accounts){
-            if(account.getNumber() == accountNumber){
-                return account.getBalance();
-            }
-        }
+        Account account = accountsMap.get(accountNumber);
 
-        throw new NonExistingAccountException("Account with this number does not exist");
+        if(account == null) throw new NonExistingAccountException("Account with this number does not exist");
+
+        return account.getBalance();
     }
 
     /**
@@ -148,18 +143,17 @@ public class Bank {
      * @param withdrawal The amount of money you want to withdraw
      * @throws NonExistingAccountException If the supplied account number does not correspond to any account in the bank
      * @throws AccountDebtException If the withdrawal was to result in negative balance on the account
+     * @throws IllegalArgumentException If the amount of money to withdraw is negative
+     * @throws AccountOverflowException If the amount of money to withdraw would overflow the accounts balance
      */
     public void withdrawMoney(int accountNumber, long withdrawal){
-        for(Account account : accounts){
-            if(account.getNumber() == accountNumber){
-                if(account.getBalance() - withdrawal < 0) throw new AccountDebtException("You cannot withdraw more money, than you have on your account");
+        Account account = accountsMap.get(accountNumber);
 
-                account.withdraw(withdrawal);
-                return;
-            }
-        }
+        if(account == null) throw new NonExistingAccountException("Account with this number does not exist");
 
-        throw new NonExistingAccountException("Account with this number does not exist");
+        if((account.getBalance() - withdrawal) < 0) throw new AccountDebtException("You cannot withdraw more money than you have on your account");
+
+        account.withdraw(withdrawal);
     }
 
     /**
@@ -179,7 +173,7 @@ public class Bank {
         FileHandler.clearFile(accountsFilePath);
         FileHandler.clearFile(outOfOrderFilePath);
 
-        for(Account account : accounts){
+        for(Account account : accountsMap.values()){
             String number = String.valueOf(account.getNumber());
             String balance = String.valueOf(account.getBalance());
 
@@ -204,7 +198,7 @@ public class Bank {
 
             if(number > highestAccountNumber) highestAccountNumber = number;
 
-            accounts.add(new Account(number, balance));
+            accountsMap.put(number, new Account(number, balance));
         }
         this.currentAccountNumber = highestAccountNumber;
 
