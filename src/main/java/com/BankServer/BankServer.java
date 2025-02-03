@@ -46,11 +46,10 @@ public class BankServer{
     public void start(){
         try {
             serverSocket = new ServerSocket(port, 1, this.ipAddress);
-            String ip_address = InetAddress.getLocalHost().getHostAddress();
 
-            logger.info("Bank server is running on ip address {} and port {}", ip_address, port);
+            logger.info("Bank server is running on ip address {} and port {}", this.ipAddress, port);
 
-            bank = new Bank(ip_address);
+            bank = new Bank(this.ipAddress.toString());
             bank.readAccounts();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
