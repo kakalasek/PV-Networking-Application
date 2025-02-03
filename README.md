@@ -4,9 +4,6 @@ Author: Josef Vetrovsky
 Date: 7. 2. 2025
 ---
 
-Context
-===
-
 Documentation
 ===
 
@@ -59,11 +56,34 @@ are case-sensitive. In the column 'Call', you can see, what you need to write an
 | Bank (Total) Amount    | BA   | BA                                           | BA &lt;number&gt;             | ER &lt;message&gt;    |
 | Bank Number Of Clients | BN   | BN                                           | BN &lt;number&gt;             | ER &lt;message&gt;    |
 
+The application logs everything everyone does into console and to a file, which will get created in the directory of the jar file.                  
+If you want to end the user connection, type **END**.
+
+Operational Diagram
+---
+
+Program Architecture
+---
+
+Exceptions and Errors
+---
+
+The application deals with all errors and exception in similar manor. It returns a string with the error message to
+the client, which caused the exception, then logs it.           
+In the case of errors, which block the program from even starting, it logs them and returns an error message into the
+console. The user then has to find a way to fix the error based on the message.
+
 Third Party Libraries
 ---
 
 org.apache.logging.log4j - log4j - version 2.23.0
 com.google.guava - guava - 32.0.1-android
+
+Resume
+---
+
+This project is supposed to be one node in a bigger peer-to-peer application. It simulates a bank and has some
+predefined standardized commands, which the user can issue.
 
 Materials
 ---
