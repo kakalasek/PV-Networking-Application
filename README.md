@@ -62,8 +62,12 @@ If you want to end the user connection, type **END**.
 Operational Diagram
 ---
 
+![Operational Diagram](Operation_Diagram.png)
+
 Program Architecture
 ---
+
+![Program Architecture](Program_Architecture.png)
 
 Exceptions and Errors
 ---
@@ -76,7 +80,7 @@ console. The user then has to find a way to fix the error based on the message.
 Third Party Libraries
 ---
 
-org.apache.logging.log4j - log4j - version 2.23.0
+org.apache.logging.log4j - log4j - version 2.23.0                       
 com.google.guava - guava - 32.0.1-android
 
 Resume
