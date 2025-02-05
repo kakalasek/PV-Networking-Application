@@ -34,7 +34,7 @@ public class Account {
         }
 
         try {
-            balance += amount;
+            balance = Math.addExact(balance, amount);
         } catch (Exception e){
             throw new AccountOverflowException("No money was deposited. There is already too much money on this account");
         }
@@ -52,7 +52,7 @@ public class Account {
         }
 
         try {
-            balance -= amount;
+            balance = Math.subtractExact(balance, amount);
         } catch (Exception e){
             throw new AccountOverflowException("No money was withdrew. The is too big of a dept on this account");
         }
