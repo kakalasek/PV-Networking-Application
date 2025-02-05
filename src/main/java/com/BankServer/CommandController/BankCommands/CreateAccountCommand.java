@@ -15,12 +15,12 @@ public class CreateAccountCommand implements BankCommand {
 
     /**
      * Creates a new account
-     * @param args Does not expect any arguments
+     * @param args  args[0] ... the command code
      * @return The number of the newly created account and the code of the bank
      */
     @Override
     public String execute(String[] args) {
 
-        return bank.createAccount() + "/" + bank.getBankCode();
+        return args[0] + " " + bank.createAccount() + "/" + bank.getBankCode();
     }
 }

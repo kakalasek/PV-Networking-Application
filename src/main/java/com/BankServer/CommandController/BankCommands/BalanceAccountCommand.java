@@ -24,16 +24,17 @@ public class BalanceAccountCommand implements BankCommand {
     }
 
     /**
-     * @param args args[0] ... accountNumber/bankCode(ipv4 address)
+     * @param args  args[0] ... the command code
+     *              args[1] ... accountNumber/bankCode(ipv4 address)
      * @return The balance of the account
      * @throws InvalidParameterException If there is any problem with the provided arguments
      * @throws RuntimeException If the provided ip does not correspond to any bank, or the server responded for too long
      */
     @Override
     public String execute(String[] args) {
-        if(args.length == 0) throw new InvalidParameterException("You have to provide your account number and ip separated by /");
+        if(args.length <= 1) throw new InvalidParameterException("You have to provide your account number and ip separated by /");
 
-        String[] accountAndIp = args[0].split("/");
+        String[] accountAndIp = args[1].split("/");
 
         if(accountAndIp.length != 2) throw new InvalidParameterException("You have to provide your account number and ip separated by /");
 
@@ -44,7 +45,7 @@ public class BalanceAccountCommand implements BankCommand {
         if(!bank.isAccountNumber(Integer.parseInt(account))) throw new InvalidParameterException("This account number cant exist in this bank");
         if(!InetAddresses.isInetAddress(ip)) throw new InvalidParameterException("The bank code must be a valid ip address");
 
-        if(ip.equals(bank.getBankCode())) return String.valueOf(bank.getAccountBalance(Integer.parseInt(account)));
+        if(ip.equals(bank.getBankCode())) return args[0] + " " + bank.getAccountBalance(Integer.parseInt(account));
 
         try (Socket socket = new Socket(InetAddresses.forString(ip), port)){
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -52,7 +53,7 @@ public class BalanceAccountCommand implements BankCommand {
 
             out.println("AB " + account + "/" + ip);
 
-            return in.readLine().substring(3);
+            return in.readLine();
 
         } catch (IOException e) {
             throw new RuntimeException("Provided ip either does not belong to any server, or the server did not respond in time");

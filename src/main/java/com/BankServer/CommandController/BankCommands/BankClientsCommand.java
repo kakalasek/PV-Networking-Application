@@ -14,11 +14,11 @@ public class BankClientsCommand implements BankCommand{
     }
 
     /**
-     * @param args Does not expect any arguments
+     * @param args  args[0] ... the command code
      * @return The number of clients in the bank
      */
     @Override
     public String execute(String[] args) {
-        return String.valueOf(bank.getNumberOfClients());
+        return args[0] + " " + bank.getNumberOfClients();
     }
 }

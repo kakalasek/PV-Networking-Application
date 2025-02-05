@@ -14,11 +14,11 @@ public class BankTotalCommand implements BankCommand{
     }
 
     /**
-     * @param args Does not expect any arguments
+     * @param args  args[0] ... the command code
      * @return The total number of money in the bank (sum of money on all the accounts)
      */
     @Override
     public String execute(String[] args) {
-        return bank.getBankTotal().toString();
+        return args[0] + " " + bank.getBankTotal().toString();
     }
 }

@@ -138,7 +138,7 @@ public class BankServer{
                         }
 
                         String[] inputLineSplit = inputLine.split(" ");
-                        String output = commandController.executeCommand(inputLineSplit[0], Arrays.copyOfRange(inputLineSplit, 1, inputLineSplit.length));
+                        String output = commandController.executeCommand(inputLineSplit[0], inputLineSplit);
                         out.println(output);
 
                         logger.info("The reply to user thread {} was: {}", clientIpAddress, output);

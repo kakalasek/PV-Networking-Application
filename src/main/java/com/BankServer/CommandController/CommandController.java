@@ -41,6 +41,6 @@ public class CommandController {
 
         if(output == null) throw new KeyException("Such a command does not exist");
 
-        return code + " " + output;
+        return output;
     }
 }

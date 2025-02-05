@@ -15,11 +15,11 @@ public class BankCodeCommand implements BankCommand {
 
     /**
      * Used to obtain the code of the bank
-     * @param args Does not expect any args
+     * @param args  args[0] ... the command code
      * @return The code of the bank
      */
     @Override
     public String execute(String[] args) {
-        return bank.getBankCode();
+        return args[0] + " " + bank.getBankCode();
     }
 }
