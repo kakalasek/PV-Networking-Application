@@ -81,7 +81,8 @@ Third Party Libraries
 ---
 
 org.apache.logging.log4j - log4j - version 2.23.0                       
-com.google.guava - guava - 32.0.1-android
+com.google.guava - guava - version 32.1.0-jre
+junit - junit - version RELEASE
 
 Resume
 ---

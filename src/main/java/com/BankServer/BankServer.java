@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.units.qual.C;
 
 public class BankServer{
 
@@ -19,6 +20,7 @@ public class BankServer{
     private final InetAddress ipAddress;
     private final int clientTimeout;
     private Bank bank;
+    private final CommandController commandController;
     private static final Logger logger = LogManager.getLogger(BankServer.class);
 
     /**
@@ -41,6 +43,19 @@ public class BankServer{
             String[] loadedIpAddressSplit = loadedIpAddress.split("\\.");
             this.ipAddress = InetAddress.getByAddress(new byte[]{(byte) Integer.parseInt(loadedIpAddressSplit[0]), (byte) Integer.parseInt(loadedIpAddressSplit[1]), (byte) Integer.parseInt(loadedIpAddressSplit[2]), (byte) Integer.parseInt(loadedIpAddressSplit[3])});
         }
+
+        this.commandController = new CommandController();
+    }
+
+    private void registerCommands(){
+        commandController.registerCommand("BC", new BankCodeCommand(bank));
+        commandController.registerCommand("AC", new CreateAccountCommand(bank));
+        commandController.registerCommand("AD", new DepositAccountCommand(bank, port));
+        commandController.registerCommand("AW", new WithdrawalAccountCommand(bank, port));
+        commandController.registerCommand("AB", new BalanceAccountCommand(bank, port));
+        commandController.registerCommand("AR", new RemoveAccountCommand(bank));
+        commandController.registerCommand("BA", new BankTotalCommand(bank));
+        commandController.registerCommand("BN", new BankClientsCommand(bank));
     }
 
     public void start(){
@@ -49,7 +64,7 @@ public class BankServer{
 
             logger.info("Bank server is running on ip address {} and port {}", this.ipAddress.getHostAddress(), port);
 
-            bank = new Bank(this.ipAddress.getHostAddress());
+            bank = new Bank(this.ipAddress.getHostAddress(), 10_000, 99_999);
             bank.readAccounts();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -60,6 +75,8 @@ public class BankServer{
                     throw new RuntimeException(e);
                 }
             }));
+
+            registerCommands();
 
             while (true) new Thread(new ClientHandler(serverSocket.accept())).start();
 
@@ -83,33 +100,19 @@ public class BankServer{
         private final String clientIpAddress;
         private PrintWriter out;
         private BufferedReader in;
-        private final CommandController commandController;
 
         public ClientHandler(Socket socket) throws SocketException {
             this.clientSocket = socket;
-            this.clientSocket.setSoTimeout(BankServer.this.clientTimeout);
+            this.clientSocket.setSoTimeout(clientTimeout);
             this.clientIpAddress = clientSocket.getRemoteSocketAddress().toString();
-            commandController = new CommandController();
         }
 
-        /**
-         * Simply registers all the commands with their code
-         */
-        private void registerCommands(){
-            commandController.registerCommand("BC", new BankCodeCommand(BankServer.this.bank));
-            commandController.registerCommand("AC", new CreateAccountCommand(BankServer.this.bank));
-            commandController.registerCommand("AD", new DepositAccountCommand(BankServer.this.bank));
-            commandController.registerCommand("AW", new WithdrawalAccountCommand(BankServer.this.bank));
-            commandController.registerCommand("AB", new BalanceAccountCommand(BankServer.this.bank));
-            commandController.registerCommand("AR", new RemoveAccountCommand(BankServer.this.bank));
-            commandController.registerCommand("BA", new BankTotalCommand(BankServer.this.bank));
-            commandController.registerCommand("BN", new BankClientsCommand(BankServer.this.bank));
-        }
 
         @Override
         public void run() {
             try {
-                registerCommands();
+                logger.info("New connection has been made by: {}", clientIpAddress);
+
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 

@@ -32,12 +32,12 @@ public class Bank {
      * @param bankCode Represents the code of the bank
      * @throws IOException Is thrown if creating the compulsory files fails
      */
-    public Bank(String bankCode) throws IOException {
+    public Bank(String bankCode, int minAccountNumber, int maxAccountNumber) throws IOException {
         this.bankCode = bankCode;
         this.accountsMap = new HashMap<>();
         this.availableAccountNumbersOutOfOrder = new ArrayList<>();
-        this.minAccountNumber = 10_000;
-        this.maxAccountNumber = 99_999;
+        this.minAccountNumber = minAccountNumber;
+        this.maxAccountNumber = maxAccountNumber;
         this.currentAccountNumber = this.minAccountNumber;
         this.accountsFilePath = "accounts.csv";
         this.outOfOrderFilePath = "outoforder.csv";

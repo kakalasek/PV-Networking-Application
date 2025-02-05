@@ -4,6 +4,7 @@ import com.BankServer.Bank.Bank;
 import com.google.common.net.InetAddresses;
 
 import java.security.InvalidParameterException;
+import java.util.Objects;
 
 /**
  * Used to remove an existing account
@@ -35,6 +36,7 @@ public class RemoveAccountCommand implements BankCommand{
         if(!account.matches("\\d+")) throw new InvalidParameterException("The account number must be a natural number");
         if(!bank.isAccountNumber(Integer.parseInt(account))) throw new InvalidParameterException("This account number cant exist in this bank");
         if(!InetAddresses.isInetAddress(ip)) throw new InvalidParameterException("The bank code must be a valid ip address");
+        if(!ip.equals(bank.getBankCode())) throw new InvalidParameterException("Provided bank code does not correspond to the bank code of this bank");
 
         bank.removeAccount(Integer.parseInt(account));
 

@@ -16,15 +16,18 @@ import java.security.InvalidParameterException;
 public class BalanceAccountCommand implements BankCommand {
 
     private final Bank bank;
+    private final int port;
 
-    public BalanceAccountCommand(Bank bank){
+    public BalanceAccountCommand(Bank bank, int port){
         this.bank = bank;
+        this.port = port;
     }
 
     /**
      * @param args args[0] ... accountNumber/bankCode(ipv4 address)
      * @return The balance of the account
      * @throws InvalidParameterException If there is any problem with the provided arguments
+     * @throws RuntimeException If the provided ip does not correspond to any bank, or the server responded for too long
      */
     @Override
     public String execute(String[] args) {
@@ -43,13 +46,13 @@ public class BalanceAccountCommand implements BankCommand {
 
         if(ip.equals(bank.getBankCode())) return String.valueOf(bank.getAccountBalance(Integer.parseInt(account)));
 
-        try (Socket socket = new Socket(InetAddresses.forString(ip), 65535)){
+        try (Socket socket = new Socket(InetAddresses.forString(ip), port)){
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             out.println("AB " + account + "/" + ip);
 
-            return in.readLine();
+            return in.readLine().substring(3);
 
         } catch (IOException e) {
             throw new RuntimeException("Provided ip either does not belong to any server, or the server did not respond in time");

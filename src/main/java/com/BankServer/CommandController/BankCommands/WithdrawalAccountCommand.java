@@ -4,6 +4,11 @@ import com.BankServer.Bank.Bank;
 import com.Utils.InputHandler.InputHandler;
 import com.google.common.net.InetAddresses;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.security.InvalidParameterException;
 
 /**
@@ -12,9 +17,11 @@ import java.security.InvalidParameterException;
 public class WithdrawalAccountCommand implements BankCommand {
 
     private final Bank bank;
+    private final int port;
 
-    public WithdrawalAccountCommand(Bank bank){
+    public WithdrawalAccountCommand(Bank bank, int port){
         this.bank = bank;
+        this.port = port;
     }
 
     /**
@@ -42,8 +49,21 @@ public class WithdrawalAccountCommand implements BankCommand {
         if(!withdrawal.matches("\\d+")) throw new InvalidParameterException("The withdrawal must be a natural number");
         if(!InputHandler.isValidLong(withdrawal)) throw new InvalidParameterException("The amount of money you want to withdraw is too large");
 
-        bank.withdrawMoney(Integer.parseInt(account), Integer.parseInt(withdrawal));
+        if(ip.equals(bank.getBankCode())){
+            bank.withdrawMoney(Integer.parseInt(account), Integer.parseInt(withdrawal));
+            return "";
+        }
 
-        return "";
+        try (Socket socket = new Socket(InetAddresses.forString(ip), port)){
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            out.println("AW " + account + "/" + ip + " " + withdrawal);
+
+            return in.readLine().substring(3);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Provided ip either does not belong to any server, or the server did not respond in time");
+        }
     }
 }
