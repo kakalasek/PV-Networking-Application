@@ -47,9 +47,9 @@ public class BankServer{
         try {
             serverSocket = new ServerSocket(port, 1, this.ipAddress);
 
-            logger.info("Bank server is running on ip address {} and port {}", this.ipAddress, port);
+            logger.info("Bank server is running on ip address {} and port {}", this.ipAddress.getHostAddress(), port);
 
-            bank = new Bank(this.ipAddress.toString());
+            bank = new Bank(this.ipAddress.getHostAddress());
             bank.readAccounts();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {

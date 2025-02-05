@@ -3,6 +3,11 @@ package com.BankServer.CommandController.BankCommands;
 import com.BankServer.Bank.Bank;
 import com.google.common.net.InetAddresses;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.security.InvalidParameterException;
 
 /**
@@ -36,6 +41,18 @@ public class BalanceAccountCommand implements BankCommand {
         if(!bank.isAccountNumber(Integer.parseInt(account))) throw new InvalidParameterException("This account number cant exist in this bank");
         if(!InetAddresses.isInetAddress(ip)) throw new InvalidParameterException("The bank code must be a valid ip address");
 
-        return String.valueOf(bank.getAccountBalance(Integer.parseInt(account)));
+        if(ip.equals(bank.getBankCode())) return String.valueOf(bank.getAccountBalance(Integer.parseInt(account)));
+
+        try (Socket socket = new Socket(InetAddresses.forString(ip), 65535)){
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            out.println("AB " + account + "/" + ip);
+
+            return in.readLine();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Provided ip either does not belong to any server, or the server did not respond in time");
+        }
     }
 }
