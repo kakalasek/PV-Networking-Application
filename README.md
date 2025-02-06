@@ -57,7 +57,11 @@ are case-sensitive. In the column 'Call', you can see, what you need to write an
 | Bank Number Of Clients | BN   | BN                                           | BN &lt;number&gt;             | ER &lt;message&gt;    |
 
 The application logs everything everyone does into console and to a file, which will get created in the directory of the jar file.                  
-If you want to end the user connection, type **END**.
+If you want to end the user connection, type **END**.               
+For commands AB, AD and AW, there is a special feature. If you specify a different bank id, the program will attempt to perform that action
+at that particular bank. It will retrieve its answer or return an error, if the provided bank id did not respond. Note that this feature
+assumes that the other bank application is running on the same port as yours. This is for the sake of the application being fast. Searching through a
+range of ports would be unnecessarily long.
 
 Operational Diagram
 ---
@@ -88,7 +92,8 @@ Resume
 ---
 
 This project is supposed to be one node in a bigger peer-to-peer application. It simulates a bank and has some
-predefined standardized commands, which the user can issue.
+predefined standardized commands, which the user can issue. It can also communicate with other bank applications in
+a certain way.
 
 Materials
 ---

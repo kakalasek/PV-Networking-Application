@@ -29,10 +29,10 @@ public class DepositMoneyTest {
 
     @Test
     public void depositTooMuchMoneyThrowsAnException(){
-        Account account = new Account(440, 999999999999999999L);
+        Account account = new Account(440, Long.MAX_VALUE);
 
         AccountOverflowException accountOverflowException = assertThrows(AccountOverflowException.class, () -> {
-            account.deposit(Long.MAX_VALUE);
+            account.deposit(1);
         });
     }
 }

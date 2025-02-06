@@ -25,7 +25,7 @@ public class WithdrawalAccountCommand implements BankCommand {
     }
 
     /**
-     * Withdraws money from a bank account
+     * Withdraws money from a bank account. If a different bank id is provided, it will attempt to perform it at that bank
      * @param args args[0] ... the command code
      *             args[1] ... accountNumber/bankCode(ipv4 address)
      *             args[2] ... amount of money to withdraw (in long datatype)

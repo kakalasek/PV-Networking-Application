@@ -25,7 +25,7 @@ public class DepositAccountCommand implements BankCommand{
     }
 
     /**
-     * Deposits money to a bank account
+     * Deposits money to a bank account. If a different bank id is provided, it will attempt to perform it at that bank
      * @param args args[0] ... the command code
      *             args[1] ... accountNumber/bankCode(ipv4 address)
      *             args[2] ... amount of money to deposit (in long datatype)

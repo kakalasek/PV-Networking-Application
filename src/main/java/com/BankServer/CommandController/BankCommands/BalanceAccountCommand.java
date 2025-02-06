@@ -24,6 +24,7 @@ public class BalanceAccountCommand implements BankCommand {
     }
 
     /**
+     * Retrieves the accounts balance. If a different bank id is provided, it will attempt to get it from that bank
      * @param args  args[0] ... the command code
      *              args[1] ... accountNumber/bankCode(ipv4 address)
      * @return The balance of the account
