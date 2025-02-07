@@ -33,6 +33,8 @@ public class Bank {
      * @throws IOException Is thrown if creating the compulsory files fails
      */
     public Bank(String bankCode, int minAccountNumber, int maxAccountNumber) throws IOException {
+        if(minAccountNumber > maxAccountNumber) throw new RuntimeException("Maximum account number must be larger than minimum account number");
+
         this.bankCode = bankCode;
         this.accountsMap = new HashMap<>();
         this.availableAccountNumbersOutOfOrder = new ArrayList<>();
