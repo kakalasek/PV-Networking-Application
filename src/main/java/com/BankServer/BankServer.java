@@ -9,6 +9,7 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.Properties;
 
+import com.Utils.InputHandler.InputHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.units.qual.C;
@@ -27,17 +28,23 @@ public class BankServer{
      * Constructor for the BankServer. It uses the config file to load the port and timeout
      * @throws IOException Gets thrown if an error occurred during loading the properties
      */
-    public BankServer() throws IOException, UnknownHostException {
+    public BankServer() throws IOException {
         Properties prop = new Properties();
 
         FileInputStream ip = new FileInputStream("config.properties");
 
         prop.load(ip);
 
-        this.port = Integer.parseInt(prop.getProperty("PORT"));
-        this.clientTimeout = Integer.parseInt(prop.getProperty("TIMEOUT"))*1000;
-
+        String port = prop.getProperty("PORT");
+        String timeout = prop.getProperty("TIMEOUT");
         String loadedIpAddress = prop.getProperty("IP");
+
+        if(!InputHandler.isValidPort(port)) throw new IOException("The port must be a number between 0 and 65535");
+        if(!InputHandler.isValidPort(timeout)) throw new IOException("The timeout must a natural number");
+
+        this.port = Integer.parseInt(port);
+        this.clientTimeout = Integer.parseInt(timeout)*1000;
+
         if(loadedIpAddress.isEmpty()) this.ipAddress = InetAddress.getLocalHost();
         else{
             String[] loadedIpAddressSplit = loadedIpAddress.split("\\.");

@@ -18,7 +18,7 @@ public class Main {
         } catch (UnknownHostException e){
             logger.fatal("IP address is invalid: {}", e.getMessage());
         }catch (IOException e) {
-            logger.fatal("The configuration file was not found: {}", e.getMessage());
+            logger.fatal("There was a problem with reading the configuration file: {}", e.getMessage());
         } catch (Exception e){
             logger.fatal("An unknown fatal error has occurred: {}", e.getMessage());
         }
